@@ -11,8 +11,23 @@ import (
 func main() {
 	commands := readInput("input.txt")
 
-	p1 := runCommands(commands)
+	grid := newGrid(1000)
+
+	for _, c := range commands {
+		grid.runCommand(c, true)
+	}
+
+	p1 := grid.countLights()
 	fmt.Println(p1)
+
+	grid = newGrid(1000)
+
+	for _, c := range commands {
+		grid.runCommand(c, false)
+	}
+
+	p2 := grid.sumLights()
+	fmt.Println(p2)
 }
 
 func readInput(fn string) []Command {
@@ -70,14 +85,4 @@ func inputToCommand(s string) Command {
 		Start:     c1,
 		End:       c2,
 	}
-}
-
-func runCommands(commands []Command) int {
-	grid := newGrid(1000)
-
-	for _, c := range commands {
-		grid.runCommand(c)
-	}
-
-	return grid.countLights()
 }
