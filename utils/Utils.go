@@ -1,9 +1,12 @@
 package utils
 
-import "fmt"
+func Sum(nums []int) int {
+	sum := 0
+	for n := range nums {
+		sum += n
+	}
 
-func HelloWorld() {
-	fmt.Println("HELLO WORLD!")
+	return sum
 }
 
 func MinIntSlice(nums []int) int {
