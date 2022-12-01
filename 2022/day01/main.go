@@ -10,12 +10,20 @@ import (
 
 func main() {
 	input := parseInput("input.txt")
-	fm := makeFoodMap(input)
 
-	p1 := findNElvesWithMostFood(fm, 1)
+	split := strings.Split(input, "\n\n")
+	calories := make([]int, 0)
+
+	for _, elf := range split {
+		calories = append(calories, countCalories(elf))
+	}
+
+	sort.Sort(sort.Reverse(sort.IntSlice(calories)))
+
+	p1 := calories[0]
 	fmt.Println("part1:", p1)
 
-	p2 := findNElvesWithMostFood(fm, 3)
+	p2 := calories[0] + calories[1] + calories[2]
 	fmt.Println("part2:", p2)
 }
 
@@ -29,46 +37,15 @@ func parseInput(fp string) string {
 	return strings.TrimSpace(string(b))
 }
 
-func makeFoodMap(s string) map[int]int {
-	fm := make(map[int]int)
-	elves := strings.Split(s, "\n\n")
-
-	for i, elf := range elves {
-		fm[i] = countCalories(elf)
-	}
-
-	return fm
-}
-
 func countCalories(s string) int {
 	sum := 0
 	for _, food := range strings.Split(s, "\n") {
-		calories, err := strconv.Atoi(strings.TrimSpace(food))
+		calories, err := strconv.Atoi(food)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}
 		sum += calories
 	}
-	return sum
-}
-
-func findNElvesWithMostFood(elves map[int]int, n int) int {
-	sum := 0
-
-	values := make([]int, 0)
-
-	for _, calories := range elves {
-		values = append(values, calories)
-	}
-
-	// sorts in ascending order
-	sort.Ints(values)
-
-	// sum top n
-	for i := 0; i < n; i++ {
-		sum += values[len(values)-1-i]
-	}
-
 	return sum
 }
