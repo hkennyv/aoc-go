@@ -1,8 +1,15 @@
 package utils
 
+func Min(x, y int) int {
+	if x < y {
+		return x
+	}
+	return y
+}
+
 func Sum(nums []int) int {
 	sum := 0
-	for n := range nums {
+	for _, n := range nums {
 		sum += n
 	}
 
