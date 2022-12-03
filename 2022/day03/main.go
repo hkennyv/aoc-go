@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -22,13 +21,10 @@ func p1(bags []string) int {
 		cs := splitCompartments(bag)
 		l, r := cs[0], cs[1]
 
-		m1 := make(map[rune]int)
-		m2 := make(map[rune]int)
+		m1 := makeRuneMap(l)
+		m2 := makeRuneMap(r)
 
-		fillMap(m1, l)
-		fillMap(m2, r)
-
-		c, _ := findCommonN(m1, m2)
+		c := findCommonN(m1, m2)
 		keys := make([]rune, 0)
 		for k := range c {
 			keys = append(keys, k)
@@ -50,11 +46,10 @@ func p2(bags []string) int {
 		ms := make([]map[rune]int, len(triplet))
 
 		for j, b := range triplet {
-			ms[j] = make(map[rune]int, 0)
-			fillMap(ms[j], b)
+			ms[j] = makeRuneMap(b)
 		}
 
-		c, _ := findCommonN(ms...)
+		c := findCommonN(ms...)
 
 		keys := make([]rune, 0)
 		for k := range c {
@@ -68,9 +63,9 @@ func p2(bags []string) int {
 	return sum
 }
 
-func findCommonN(ms ...map[rune]int) (map[rune]int, error) {
+func findCommonN(ms ...map[rune]int) map[rune]int {
 	if len(ms) == 1 {
-		return nil, errors.New("need more than 1 map")
+		return ms[0]
 	}
 
 	common := make(map[rune]int, 0)
@@ -89,7 +84,7 @@ func findCommonN(ms ...map[rune]int) (map[rune]int, error) {
 		}
 	}
 
-	return common, nil
+	return common
 }
 
 func calculatePriority(r rune) int {
@@ -105,7 +100,17 @@ func calculatePriority(r rune) int {
 	}
 }
 
+func makeRuneMap(s string) map[rune]int {
+	m := make(map[rune]int)
+	for _, c := range s {
+		m[c] = 1
+	}
+
+	return m
+}
+
 func fillMap(m map[rune]int, s string) {
+
 	for _, c := range s {
 		if _, ok := m[c]; !ok {
 			m[c] = 1
@@ -114,12 +119,10 @@ func fillMap(m map[rune]int, s string) {
 }
 
 func splitCompartments(s string) []string {
-	r := make([]string, 0)
-
-	r = append(r, s[0:len(s)/2])
-	r = append(r, s[len(s)/2:])
-
-	return r
+	return []string{
+		s[0 : len(s)/2],
+		s[len(s)/2:],
+	}
 }
 
 func parseInput(fp string) []string {
