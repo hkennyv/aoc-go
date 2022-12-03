@@ -109,15 +109,6 @@ func makeRuneMap(s string) map[rune]int {
 	return m
 }
 
-func fillMap(m map[rune]int, s string) {
-
-	for _, c := range s {
-		if _, ok := m[c]; !ok {
-			m[c] = 1
-		}
-	}
-}
-
 func splitCompartments(s string) []string {
 	return []string{
 		s[0 : len(s)/2],
