@@ -46,7 +46,7 @@ func findStartOfPacket(s string, n int) int {
 }
 
 func isUnique(bs []byte, n int) bool {
-	m := make(map[byte]struct{}, 14)
+	m := make(map[byte]struct{}, n)
 	for _, b := range bs {
 		if _, ok := m[b]; ok {
 			return false
