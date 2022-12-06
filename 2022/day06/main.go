@@ -1,9 +1,9 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"os"
-	"strings"
 )
 
 func main() {
@@ -13,17 +13,17 @@ func main() {
 	fmt.Println("part2:", findStartOfPacket(input, 14))
 }
 
-func parseInput(fp string) string {
+func parseInput(fp string) []byte {
 	b, _ := os.ReadFile(fp)
-	return strings.TrimSpace(string(b))
+	return bytes.TrimSpace(b)
 }
 
-func findStartOfPacket(s string, n int) int {
+func findStartOfPacket(bs []byte, n int) int {
 	buf := make([]byte, n)
 
 	// prefill buf
 	for i := 0; i < n; i++ {
-		buf[i] = s[i]
+		buf[i] = bs[i]
 	}
 
 	// first check
@@ -32,9 +32,9 @@ func findStartOfPacket(s string, n int) int {
 	}
 
 	// check rest
-	for i := n; i < len(s); i++ {
+	for i := n; i < len(bs); i++ {
 		for j := 0; j < n; j++ {
-			buf[j] = s[i-(n-1)+j]
+			buf[j] = bs[i-(n-1)+j]
 		}
 
 		if isUnique(buf, n) {
