@@ -27,9 +27,9 @@ func main() {
 	fmt.Println("part2:", simulate(input, 10))
 }
 
-func simulate(input []string, n int) int {
+func simulate(input []string, knots int) int {
 	history := make(map[Pos]struct{}, 0)
-	rope := make([]Pos, n)
+	rope := make([]Pos, knots)
 
 	history[rope[len(rope)-1]] = struct{}{}
 
