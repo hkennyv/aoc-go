@@ -28,6 +28,8 @@ func run(ops []int) int {
 
 	for i := 0; i < len(ops); i++ {
 		pos := i % 40
+		cycle := i + 1
+
 		if pos == 0 {
 			fmt.Printf("\n")
 		}
@@ -37,8 +39,8 @@ func run(ops []int) int {
 			fmt.Printf(".")
 		}
 
-		if _, ok := cycleCheck[i+1]; ok {
-			sum += x * (i + 1)
+		if _, ok := cycleCheck[cycle]; ok {
+			sum += x * (cycle)
 		}
 
 		x += ops[i]
