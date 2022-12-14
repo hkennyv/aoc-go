@@ -7,6 +7,13 @@ func Min(x, y int) int {
 	return y
 }
 
+func Max(x, y int) int {
+	if x > y {
+		return x
+	}
+	return y
+}
+
 func Sum(nums []int) int {
 	sum := 0
 	for _, n := range nums {
