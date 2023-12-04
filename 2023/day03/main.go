@@ -14,30 +14,14 @@ type Interval struct {
 	start int
 	end   int
 }
-type Point Interval
+type Point struct {
+	row int
+	col int
+}
 type Engine [][]rune
-
-// var sample = `467..114..
-// ...*......
-// ..35..633.
-// ......#...
-// 617*......
-// .....+.58.
-// ..592.....
-// ......755.
-// ...$.*....
-// .664.598..
-// `
 
 func main() {
 	engine := parseInput("input.txt")
-
-	// engine := make([][]rune, 0)
-	// split := strings.Split(sample, "\n")
-
-	// for _, s := range split {
-	// 	engine = append(engine, []rune(s))
-	// }
 
 	p1 := part1(engine)
 	fmt.Println("part1:", p1)
@@ -51,29 +35,15 @@ func part1(engine Engine) int {
 
 	for i := range engine {
 		for j := range engine[i] {
-			c := engine[i][j]
+			ch := engine[i][j]
 
-			// is not a symbol
-			if !isSymbol(c) {
+			if !isSymbol(ch) {
 				continue
 			}
 
-			fmt.Println("\n===", i+1, j+1)
-
-			// check row above, current, and below for adjacent part numbers
-			for ii := utils.Max(0, i-1); ii <= utils.Min(len(engine)-1, i+1); ii++ {
-				intervals := findIntervals(engine[ii])
-				for _, interval := range intervals {
-					l := utils.Max(0, j-1)
-					r := utils.Min(len(engine[0])-1, j+1)
-
-					if isOverlapping(interval, Interval{l, r + 1}) {
-						p := Point{ii, interval.start}
-						n, _ := strconv.Atoi(string(engine[ii][interval.start:interval.end]))
-						parts[p] = n
-						fmt.Printf("(%d,%d) %d\n", ii, j, n)
-					}
-				}
+			adjacents := findAdjacents(engine, i, j)
+			for k, v := range adjacents {
+				parts[k] += v
 			}
 		}
 	}
@@ -92,37 +62,18 @@ func part2(engine Engine) int {
 
 	for i := range engine {
 		for j := range engine[i] {
-			c := engine[i][j]
+			ch := engine[i][j]
 
-			// is not a symbol
-			if c != '*' {
+			// is not a gear
+			if ch != '*' {
 				continue
 			}
 
-			fmt.Println("\n===", i+1, j+1)
+			adjacents := findAdjacents(engine, i, j)
 
-			// check row above, current, and below for adjacent part numbers
-			numAdjacent := make(map[Point]int, 0)
-
-			for ii := utils.Max(0, i-1); ii <= utils.Min(len(engine)-1, i+1); ii++ {
-				intervals := findIntervals(engine[ii])
-				for _, interval := range intervals {
-					l := utils.Max(0, j-1)
-					r := utils.Min(len(engine[0])-1, j+1)
-
-					if isOverlapping(interval, Interval{l, r + 1}) {
-						p := Point{ii, interval.start}
-						n, _ := strconv.Atoi(string(engine[ii][interval.start:interval.end]))
-						numAdjacent[p] = n
-
-						fmt.Printf("(%d,%d) %d\n", ii, j, n)
-					}
-				}
-			}
-
-			if len(numAdjacent) == 2 {
+			if len(adjacents) == 2 {
 				val := 1
-				for _, v := range numAdjacent {
+				for _, v := range adjacents {
 					val *= v
 				}
 
@@ -134,6 +85,42 @@ func part2(engine Engine) int {
 	return total
 }
 
+func findAdjacents(engine Engine, row, col int) map[Point]int {
+	adjacents := make(map[Point]int, 0)
+
+	// look in row above, current, and below the symbol
+	//
+	// find the intervals of all the numbers and see if it overlaps with the
+	// column interval of the symbol
+
+	// vertical bounds
+	vstart := utils.Max(0, row-1)
+	vend := utils.Min(len(engine)-1, row+1)
+
+	for i := vstart; i <= vend; i++ {
+		intervals := findIntervals(engine[i])
+
+		for _, numInterval := range intervals {
+
+			// horizontal bounds
+			hstart := utils.Max(0, col-1)
+			hend := utils.Min(len(engine[0])-1, col+1)
+
+			// interval is left-inclusive, right non-inclusive
+			symbolInteval := Interval{hstart, hend + 1}
+
+			if isOverlapping(numInterval, symbolInteval) {
+				p := Point{i, numInterval.start}
+				n, _ := strconv.Atoi(string(engine[i][numInterval.start:numInterval.end]))
+
+				adjacents[p] = n
+			}
+		}
+	}
+
+	return adjacents
+}
+
 func findIntervals(runes []rune) []Interval {
 	intervals := make([]Interval, 0)
 
@@ -141,14 +128,16 @@ func findIntervals(runes []rune) []Interval {
 	end := -1
 
 	for i := range runes {
-		c := runes[i]
+		ch := runes[i]
 
-		if start < 0 && unicode.IsNumber(c) {
+		// start
+		if start < 0 && unicode.IsNumber(ch) {
 			start = i
 			continue
 		}
 
-		if start >= 0 && !unicode.IsNumber(c) {
+		// end of num in middle of line
+		if start >= 0 && !unicode.IsNumber(ch) {
 			end = i
 			intervals = append(intervals, Interval{start, end})
 
@@ -156,6 +145,7 @@ func findIntervals(runes []rune) []Interval {
 			end = -1
 		}
 
+		// end of num end of the line
 		if start >= 0 && i == len(runes)-1 {
 			end = i + 1
 			intervals = append(intervals, Interval{start, end})

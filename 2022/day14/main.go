@@ -27,12 +27,49 @@ func main() {
 		return row <= b
 	}
 	fmt.Println("part1:", pourSand(grid, untilVoid))
+	printGrid(grid)
 
 	grid = makeGrid(traces, true)
-	untilSourceBlocked := func(row int) bool {
-		return true
+	fmt.Println("part2:", pourSandUntilFull(grid))
+}
+
+func pourSandUntilFull(g Grid) int {
+	count := 0
+	col, row := 500, 0
+
+	for {
+
+		if g[row][col] != 0 {
+
+			// check diagonal left & right
+			if g[row][col-1] != 0 && g[row][col+1] != 0 {
+
+				if row-1 == -1 {
+					printGrid(g)
+					fmt.Println("OOB!", row, col, count)
+					return -1
+				}
+
+				fmt.Println("sand:", row, col)
+				g[row-1][col] = 'o'
+				count++
+				col = 500
+				row = 0
+				// move left
+			} else if g[row][col-1] == 0 {
+				col--
+				// move right
+			} else if g[row][col+1] == 0 {
+				col++
+			}
+
+			// keep falling
+		} else {
+			row++
+		}
 	}
-	pourSand(grid, untilSourceBlocked)
+
+	return count
 }
 
 func pourSand(g Grid, cond func(int) bool) int {
@@ -68,6 +105,18 @@ func pourSand(g Grid, cond func(int) bool) int {
 		}
 	}
 
+	return count
+}
+
+func countSand(g Grid) int {
+	count := 0
+	for i := 0; i < len(g); i++ {
+		for j := 0; j < len(g[i]); j++ {
+			if g[i][j] == 'o' {
+				count++
+			}
+		}
+	}
 	return count
 }
 
